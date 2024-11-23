@@ -27,7 +27,6 @@ var historyCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(historyCmd)
-
 }
 
 func history() {
@@ -77,7 +76,7 @@ func initTable() table.Model {
 	rows := []table.Row{
 		{"1", "neofetch"},
 		{"2", "ls"},
-		{"3", "cd"},
+		{"3", "echo bruh"},
 		{"4", "touch"},
 	}
 
