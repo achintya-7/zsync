@@ -74,10 +74,16 @@ func initTable() table.Model {
 
 	// run the terminal table
 	rows := []table.Row{
-		{"1", "neofetch"},
-		{"2", "ls"},
-		{"3", "echo bruh"},
-		{"4", "touch"},
+		{"1", "neofetch", "5"},
+		{"2", "ls", "10"},
+		{"3", "gcloud auth list", "2"},
+		{"4", "touch bruh.txt", "3"},
+		{"5", "cat bruh.txt", "1"},
+		{"6", "rm bruh.txt", "1"},
+		{"7", "ls", "5"},
+		{"8", "ls -l", "3"},
+		{"9", "ls -a", "2"},
+		{"10", "ls -la", "1"},	
 	}
 
 	t := table.New(

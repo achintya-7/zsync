@@ -2,8 +2,10 @@ package ui
 
 import (
 	"os/exec"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/table"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -15,14 +17,20 @@ var (
 )
 
 type Model struct {
-	Table table.Model
-	Done  bool
+	Table         table.Model
+	Search        textinput.Model
+	Done          bool
+	OriginalRows  []table.Row
+	FocusedInput  string // can be "table" or "search"
 }
 
-func (m Model) Init() tea.Cmd { return nil }
+func (m Model) Init() tea.Cmd {
+	return textinput.Blink
+}
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -30,27 +38,74 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.Done = true
 			return m, tea.Quit
 		case "enter":
-			m.Done = true
-			return m, runCommand(m.Table.SelectedRow()[1])
+			if m.FocusedInput == "table" {
+				m.Done = true
+				cmdParts := strings.Fields(m.Table.SelectedRow()[1])
+				if len(cmdParts) == 0 {
+					return m, tea.Quit
+				}
+				
+				selectedCmd := exec.Command(cmdParts[0], cmdParts[1:]...)
+				return m, tea.Sequence(
+					tea.ExecProcess(selectedCmd, nil),
+					tea.Quit,
+				)
+			}
+		case "/":
+			if m.FocusedInput == "table" {
+				m.FocusedInput = "search"
+				m.Search.Focus()
+				return m, textinput.Blink
+			}
+		case "esc":
+			if m.FocusedInput == "search" {
+				m.FocusedInput = "table"
+				m.Search.Blur()
+				return m, nil
+			}
+		}
+
+		if m.FocusedInput == "search" {
+			var searchCmd tea.Cmd
+			m.Search, searchCmd = m.Search.Update(msg)
+			
+			// Filter table based on search input
+			filteredRows := []table.Row{}
+			searchText := strings.ToLower(m.Search.Value())
+			for _, row := range m.OriginalRows {
+				if strings.Contains(strings.ToLower(row[1]), searchText) {
+					filteredRows = append(filteredRows, row)
+				}
+			}
+			m.Table.SetRows(filteredRows)
+			
+			return m, searchCmd
 		}
 	}
-	m.Table, cmd = m.Table.Update(msg)
+
+	if m.FocusedInput == "table" {
+		m.Table, cmd = m.Table.Update(msg)
+	}
 	return m, cmd
 }
 
-func runCommand(cmd string) tea.Cmd {
-	execCommand := exec.Command(cmd)
-
-	return tea.Sequence(
-		tea.ExecProcess(exec.Command("clear"), nil),
-		tea.ExecProcess(execCommand, nil),
-		tea.ClearScreen,
-		tea.Quit,
-	)
-}
-
 func (m Model) View() string {
-	return baseStyle.Render(m.Table.View()) + "\n  " + m.Table.HelpView() + "\n"
+	var s strings.Builder
+
+	s.WriteString(baseStyle.Render(m.Table.View()))
+	s.WriteString("\n  ")
+	s.WriteString(m.Table.HelpView())
+	s.WriteString("\n  ")
+	
+	// Add search prompt
+	if m.FocusedInput == "search" {
+		s.WriteString(m.Search.View())
+	} else {
+		s.WriteString("Press / to search")
+	}
+	s.WriteString("\n")
+
+	return s.String()
 }
 
 func (m Model) ClearView() string {
@@ -59,5 +114,15 @@ func (m Model) ClearView() string {
 
 // NewModel returns a new Model
 func NewModel(table table.Model) Model {
-	return Model{Table: table}
+	ti := textinput.New()
+	ti.Placeholder = "Search commands..."
+	ti.CharLimit = 100
+	ti.Width = 30
+
+	return Model{
+		Table:        table,
+		Search:       ti,
+		OriginalRows: table.Rows(),
+		FocusedInput: "table",
+	}
 }
