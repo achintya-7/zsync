@@ -6,3 +6,12 @@ migrateup:
 
 migratedown:
 	migrate -path db/migration -database "sqlite://./db/sqlite3.db" -verbose down
+
+test:
+	go test -v -cover ./...
+
+build:
+	go build -o bin/main main.go
+
+history:
+	go run main.go history
