@@ -13,5 +13,8 @@ test:
 build:
 	go build -o bin/main main.go
 
+init:
+	go run main.go init
+
 history:
 	go run main.go history

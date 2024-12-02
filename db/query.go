@@ -4,68 +4,84 @@ import (
 	"gorm.io/gorm"
 )
 
+func init() {
+	if globalDB == nil {
+		globalDB = InitDB()
+	}
+}
+
+var (
+	globalDB *gorm.DB
+)
+
 // CreateConfig creates a new Config record
-func CreateConfig(db *gorm.DB, config Config) error {
-	return db.Create(&config).Error
+func CreateConfig(config Config) error {
+	return globalDB.Create(&config).Error
 }
 
 // GetConfig retrieves a Config record
-func GetConfig(db *gorm.DB) (Config, error) {
+func GetConfig() (Config, error) {
 	var config Config
-	err := db.First(&config).Error
+	err := globalDB.First(&config).Error
 	return config, err
 }
 
 // UpdateConfig updates an existing Config record
-func UpdateConfig(db *gorm.DB, config Config) error {
-	return db.Save(&config).Error
+func UpdateConfig(config Config) error {
+	return globalDB.Save(&config).Error
 }
 
 // DeleteConfig deletes a Config record
-func DeleteConfig(db *gorm.DB, config Config) error {
-	return db.Delete(&config).Error
+func DeleteConfig(config Config) error {
+	return globalDB.Delete(&config).Error
 }
 
 // CreateURL creates a new URL record
-func CreateURL(db *gorm.DB, url URL) error {
-	return db.Create(&url).Error
+func CreateURL(url URL) error {
+	return globalDB.Create(&url).Error
 }
 
 // GetURL retrieves a URL record by key
-func GetURL(db *gorm.DB, key int) (URL, error) {
+func GetURL(key int) (URL, error) {
 	var url URL
-	err := db.First(&url, key).Error
+	err := globalDB.First(&url, key).Error
 	return url, err
 }
 
 // UpdateURL updates an existing URL record
-func UpdateURL(db *gorm.DB, url URL) error {
-	return db.Save(&url).Error
+func UpdateURL(url URL) error {
+	return globalDB.Save(&url).Error
 }
 
 // DeleteURL deletes a URL record
-func DeleteURL(db *gorm.DB, url URL) error {
-	return db.Delete(&url).Error
+func DeleteURL(url URL) error {
+	return globalDB.Delete(&url).Error
 }
 
 // CreateCommand creates a new Command record
-func CreateCommand(db *gorm.DB, command Command) error {
-	return db.Create(&command).Error
+func CreateCommand(command Command) error {
+	return globalDB.Create(&command).Error
 }
 
 // GetCommand retrieves a Command record by key
-func GetCommand(db *gorm.DB, key int) (Command, error) {
+func GetCommand(key int) (Command, error) {
 	var command Command
-	err := db.First(&command, key).Error
+	err := globalDB.First(&command, key).Error
 	return command, err
 }
 
+func GetAllCommands() ([]Command, error) {
+	var commands []Command
+	err := globalDB.Find(&commands).Error
+	return commands, err
+}
+
 // UpdateCommand updates an existing Command record
-func UpdateCommand(db *gorm.DB, command Command) error {
-	return db.Save(&command).Error
+func UpdateCommand(command Command) error {
+	return globalDB.Save(&command).Error
 }
 
 // DeleteCommand deletes a Command record
-func DeleteCommand(db *gorm.DB, command Command) error {
-	return db.Delete(&command).Error
+func DeleteCommand(command Command) error {
+	return globalDB.Delete(&command).Error
 }

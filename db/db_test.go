@@ -10,7 +10,7 @@ import (
 func TestInitMigration(t *testing.T) {
 	defer clearTest()
 
-	InitMigration()
+	InitDbAndMigration()
 
 	// check if the database is created
 	f, err := os.Stat("./zsync.db")

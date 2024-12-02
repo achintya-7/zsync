@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// InitMigration sets up the SQLite database and runs migrations
-func InitMigration() {
+// InitDbAndMigration sets up the SQLite database and runs migrations
+func InitDbAndMigration() {
 	// setup a sqlite database using GORM
 	db, err := gorm.Open(sqlite.Open("zsync.db"), &gorm.Config{})
 	if err != nil {
@@ -20,4 +20,14 @@ func InitMigration() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func InitDB() *gorm.DB {
+	// setup a sqlite database using GORM
+	db, err := gorm.Open(sqlite.Open("zsync.db"), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
 }
