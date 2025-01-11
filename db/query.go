@@ -1,6 +1,9 @@
 package db
 
 import (
+	"errors"
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -84,4 +87,35 @@ func UpdateCommand(command Command) error {
 // DeleteCommand deletes a Command record
 func DeleteCommand(command Command) error {
 	return globalDB.Delete(&command).Error
+}
+
+func InsertCommand(input string) error {
+	var command Command
+	err := globalDB.Where("command = ?", input).First(&command).Error
+	if err == nil {
+		command.Frequency++
+		err := globalDB.Save(&command).Error
+		if err != nil {
+			return errors.New("Error updating command frequency: " + err.Error())
+		}
+	}
+
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			fmt.Println("Error querying the database: ", err)
+			return errors.New("Error querying the database: " + err.Error())
+		}
+
+		newCommand := Command{
+			Command:   input,
+			Frequency: 1,
+		}
+
+		err := globalDB.Create(&newCommand).Error
+		if err != nil {
+			return errors.New("Error creating new command: " + err.Error())
+		}
+	}
+
+	return nil
 }
