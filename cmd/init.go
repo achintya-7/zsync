@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/achintya-7/zsync/db"
+	"github.com/achintya-7/zsync/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +42,24 @@ func initZsync() {
 
 	// setup a cron job to sync periodically
 
+	// start the server to listen for zsh commands and sync requests
+
+	// ask from the user to fill the .zshrc file
+	var response string
+	fmt.Print("Do you want to proceed with filling the .zshrc file? (y/n): ")
+	fmt.Scanln(&response)
+	if response != "y" {
+		fmt.Println("Aborting the .zshrc file setup.")
+		return
+	}
+
+	// fill the .zshr file with the required data
+	msg, err := utils.CheckAndFillZshrc()
+	fmt.Println(msg)
+	if err != nil {
+		return
+	}
+
 	// print success message
 	fmt.Println("zsync initialized successfully")
-	fmt.Println("Use { zsync [command] } to sync your CLIs")
 }
