@@ -41,8 +41,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.Search.Reset()
 
 		case "enter":
+			// If no row is selected, do nothing
+			if len(m.Table.SelectedRow()) == 0 {
+				return m, tea.Quit
+			}
+
 			command := m.Table.SelectedRow()[1]
-			
+
 			cmdParts := strings.Fields(command)
 			if len(cmdParts) == 0 {
 				return m, tea.Quit

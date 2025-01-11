@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/achintya-7/zsync/db"
 	"github.com/achintya-7/zsync/ui"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -72,19 +73,7 @@ func initTable() table.Model {
 		{Title: "Frequency", Width: 10},
 	}
 
-	// run the terminal table
-	rows := []table.Row{
-		{"1", "neofetch", "5"},
-		{"2", "ls", "10"},
-		{"3", "gcloud auth list", "2"},
-		{"4", "touch bruh.txt", "3"},
-		{"5", "cat bruh.txt", "1"},
-		{"6", "rm bruh.txt", "1"},
-		{"7", "ls", "5"},
-		{"8", "ls -l", "3"},
-		{"9", "ls -a", "2"},
-		{"10", "ls -la", "1"},	
-	}
+	rows := generateRowsFromSql()
 
 	t := table.New(
 		table.WithColumns(columns),
@@ -108,4 +97,24 @@ func initTable() table.Model {
 	t.SetStyles(s)
 
 	return t
+}
+
+func generateRowsFromSql() []table.Row {
+	rows := []table.Row{}
+
+	commands, err := db.GetAllCommands()
+	if err != nil {
+		fmt.Println("Error getting all the commands")
+		return rows
+	}
+
+	for i, command := range commands {
+		rows = append(rows, table.Row{
+			fmt.Sprintf("%d", i+1),
+			command.Command,
+			fmt.Sprintf("%d", command.Frequency),
+		})
+	}
+
+	return rows
 }

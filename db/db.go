@@ -1,46 +1,33 @@
 package db
 
 import (
-	"database/sql"
 	"log"
 
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/glebarez/sqlite"
+	"gorm.io/gorm"
 )
 
-// setup a sqlite database and run migrations
-func InitMigration(migrationSource string, dbSource string) {
-	// setup a sqlite database
-	db, err := sql.Open("sqlite3", "./zsync.db")
+// InitDbAndMigration sets up the SQLite database and runs migrations
+func InitDbAndMigration() {
+	// setup a sqlite database using GORM
+	db, err := gorm.Open(sqlite.Open("zsync.db"), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// run migrations
-	err = runDbMigrations(migrationSource, dbSource)
+	// run migrations using GORM
+	err = db.AutoMigrate(&Config{}, &URL{}, &Command{})
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func runDbMigrations(migrationUrl string, dbSource string) error {
-	// run migrations
-	migration, err := migrate.New(migrationUrl, dbSource)
+func InitDB() *gorm.DB {
+	// setup a sqlite database using GORM
+	db, err := gorm.Open(sqlite.Open("zsync.db"), &gorm.Config{})
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
-	err = migration.Up()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return db
 }

@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/achintya-7/zsync/db"
 	"github.com/spf13/cobra"
 )
 
@@ -25,9 +26,10 @@ func init() {
 	rootCmd.AddCommand(initCmd)
 }
 
-// initializes zsync	
+// initializes zsync
 func initZsync() {
 	// setup a sqlite database
+	db.InitDbAndMigration()
 
 	// ask for remote URLs, pass them in comma separated format
 
@@ -36,7 +38,7 @@ func initZsync() {
 	// check for any remote sync config and set it up
 
 	// ask and try to sync with remote
-	
+
 	// setup a cron job to sync periodically
 
 	// print success message
