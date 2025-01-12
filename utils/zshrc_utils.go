@@ -16,6 +16,8 @@ zsync_preexec() {
         -d '{"command":"'"$cmd"'", "cwd":"'"$pwd"'"}' \
         http://localhost:8080/log > /dev/null & echo $! )
 }
+
+preexec_functions+=('zsync_preexec')
 `
 
 func CheckAndFillZshrc() (string, error) {
