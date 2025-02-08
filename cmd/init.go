@@ -29,8 +29,8 @@ func init() {
 
 // initializes zsync
 func initZsync() {
-	// setup a sqlite database
-	db.InitDbAndMigration()
+	// initialize the store
+	db.NewStore("zsync.db", "db/migrations")
 
 	// ask for remote URLs, pass them in comma separated format
 

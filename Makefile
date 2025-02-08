@@ -1,4 +1,4 @@
-new_migration:
+newMigration:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
 migrateup:
@@ -6,6 +6,9 @@ migrateup:
 
 migratedown:
 	migrate -path db/migration -database "sqlite://./db/sqlite3.db" -verbose down
+
+gen:
+	sqlc generate
 
 test:
 	go test -v -cover ./...
