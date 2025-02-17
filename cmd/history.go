@@ -4,6 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"syscall"
 	"unsafe"
@@ -102,7 +103,7 @@ func initTable() table.Model {
 func generateRowsFromSql() []table.Row {
 	rows := []table.Row{}
 
-	commands, err := db.GetAllCommands()
+	commands, err := db.GlobalStore.GetAllCommands(context.TODO())
 	if err != nil {
 		fmt.Println("Error getting all the commands")
 		return rows
