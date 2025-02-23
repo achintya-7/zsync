@@ -168,10 +168,10 @@ func (q *Queries) GetTopCommands(ctx context.Context) ([]Command, error) {
 	return items, nil
 }
 
-const insertUrl = `-- name: InsertUrl :one
+const insertUrl = `-- name: InsertUrl :exec
 INSERT INTO urls (url, platform, created_at) 
-VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT DO NOTHING
-RETURNING "key", url, platform, created_at
+VALUES (?, ?, CURRENT_TIMESTAMP) 
+ON CONFLICT (url) DO NOTHING
 `
 
 type InsertUrlParams struct {
@@ -179,16 +179,9 @@ type InsertUrlParams struct {
 	Platform string
 }
 
-func (q *Queries) InsertUrl(ctx context.Context, arg InsertUrlParams) (Url, error) {
-	row := q.db.QueryRowContext(ctx, insertUrl, arg.Url, arg.Platform)
-	var i Url
-	err := row.Scan(
-		&i.Key,
-		&i.Url,
-		&i.Platform,
-		&i.CreatedAt,
-	)
-	return i, err
+func (q *Queries) InsertUrl(ctx context.Context, arg InsertUrlParams) error {
+	_, err := q.db.ExecContext(ctx, insertUrl, arg.Url, arg.Platform)
+	return err
 }
 
 const queryCommands = `-- name: QueryCommands :many

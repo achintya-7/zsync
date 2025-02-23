@@ -26,10 +26,10 @@ INSERT INTO config (cron_seconds)
 VALUES (?) ON CONFLICT DO NOTHING 
 RETURNING *;
 
--- name: InsertUrl :one
+-- name: InsertUrl :exec
 INSERT INTO urls (url, platform, created_at) 
-VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT DO NOTHING
-RETURNING *;
+VALUES (?, ?, CURRENT_TIMESTAMP) 
+ON CONFLICT (url) DO NOTHING;
 
 -- name: DeleteUrl :one
 DELETE FROM urls WHERE url = ? RETURNING *;

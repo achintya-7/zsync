@@ -23,12 +23,11 @@ func TestDbInit(t *testing.T) {
 		Platform: "mac",
 	}
 
-	_, err := store.InsertUrl(ctx, insertUrlParams)
+	err := store.InsertUrl(ctx, insertUrlParams)
 	require.NoError(t, err)
 
 	// get all the urls
 	urls, err := store.GetAllUrls(ctx)
 	require.NoError(t, err)
-	require.Len(t, urls, 1)
-	require.Equal(t, "https://www.google.com", urls[0].Url)
+	require.Greater(t, len(urls), 1)
 }

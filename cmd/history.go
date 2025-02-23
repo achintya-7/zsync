@@ -6,8 +6,8 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"syscall"
-	"unsafe"
+
+	"golang.org/x/sys/windows"
 
 	"github.com/achintya-7/zsync/db"
 	"github.com/achintya-7/zsync/ui"
@@ -44,21 +44,14 @@ func history() {
 }
 
 func getTerminalWidth() int {
-	var ws struct {
-		Row    uint16
-		Col    uint16
-		Xpixel uint16
-		Ypixel uint16
-	}
-	_, _, err := syscall.Syscall(syscall.SYS_IOCTL,
-		uintptr(syscall.Stdin),
-		uintptr(syscall.TIOCGWINSZ),
-		uintptr(unsafe.Pointer(&ws)),
-	)
-	if err != 0 {
+	var ws windows.ConsoleScreenBufferInfo
+
+	err := windows.GetConsoleScreenBufferInfo(windows.Stdout, &ws)
+	if err != nil {
 		return 80 // default width
 	}
-	return int(ws.Col)
+
+	return int(ws.Size.X)
 }
 
 func initTable() table.Model {

@@ -9,7 +9,7 @@ import (
 )
 
 type Command struct {
-	Key          interface{}
+	Key          int64
 	Command      string
 	Frequency    int64
 	CreatedAt    time.Time
@@ -21,7 +21,7 @@ type Config struct {
 }
 
 type Url struct {
-	Key       interface{}
+	Key       int64
 	Url       string
 	Platform  string
 	CreatedAt time.Time

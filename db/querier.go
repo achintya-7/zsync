@@ -17,7 +17,7 @@ type Querier interface {
 	GetCommandsByPlatform(ctx context.Context, platform string) (Url, error)
 	GetCroneSeconds(ctx context.Context) (int64, error)
 	GetTopCommands(ctx context.Context) ([]Command, error)
-	InsertUrl(ctx context.Context, arg InsertUrlParams) (Url, error)
+	InsertUrl(ctx context.Context, arg InsertUrlParams) error
 	QueryCommands(ctx context.Context, dollar_1 sql.NullString) ([]Command, error)
 	UpsertCommand(ctx context.Context, arg UpsertCommandParams) (Command, error)
 	UpsertConfig(ctx context.Context, cronSeconds int64) (int64, error)
